@@ -28,22 +28,22 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
   };
 
   return (
-    <div className="border-t bg-background p-4">
-      <form onSubmit={handleSubmit} className="flex items-end space-x-2">
+    <div className="p-3 sm:p-4">
+      <form onSubmit={handleSubmit} className="flex items-end space-x-2 sm:space-x-3">
         <div className="flex-1">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="พิมพ์ข้อความของคุณที่นี่..."
-            className="min-h-[50px] max-h-[150px] resize-none border-2 focus:border-primary transition-colors"
+            className="min-h-[44px] sm:min-h-[50px] max-h-[120px] sm:max-h-[150px] resize-none border-2 focus:border-primary transition-colors text-sm sm:text-base"
             disabled={isLoading}
           />
         </div>
         <Button
           type="submit"
           disabled={!message.trim() || isLoading}
-          className="h-[50px] px-4 rounded-xl"
+          className="h-[44px] sm:h-[50px] px-3 sm:px-4 rounded-xl shrink-0"
         >
           <Send className="w-4 h-4" />
         </Button>

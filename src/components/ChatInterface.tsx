@@ -47,7 +47,6 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      // ส่งประวัติการสนทนาไปด้วย
       const conversationHistory = getConversationHistory();
       const response = await sendMessage(text, conversationHistory);
       
@@ -81,33 +80,35 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="flex items-center justify-center p-4">
+      {/* Header - More compact on mobile */}
+      <div className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex items-center justify-between p-3 sm:p-4">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </div>
-            <h1 className="text-xl font-semibold">AI Chat</h1>
-            <span className="text-xs text-muted-foreground">ID: {conversationId}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
+              <h1 className="text-lg sm:text-xl font-semibold">AI Chat</h1>
+              <span className="text-xs text-muted-foreground hidden sm:inline">ID: {conversationId}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Messages - Better mobile spacing */}
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-4">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
-              <MessageSquare className="w-8 h-8 text-white" />
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
+              <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
-            <h2 className="text-2xl font-semibold mb-2">ยินดีต้อนรับสู่ AI Chat</h2>
-            <p className="text-muted-foreground max-w-md">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-2">ยินดีต้อนรับสู่ AI Chat</h2>
+            <p className="text-muted-foreground max-w-md text-sm sm:text-base">
               เริ่มบทสนทนากับ AI อัจฉริยะ ถามคำถามอะไรก็ได้ ฉันพร้อมช่วยเหลือคุณ
             </p>
           </div>
         ) : (
-          <>
+          <div className="max-w-4xl mx-auto">
             {messages.map((message) => (
               <MessageBubble
                 key={message.id}
@@ -116,14 +117,22 @@ const ChatInterface = () => {
                 timestamp={message.timestamp}
               />
             ))}
-            {isLoading && <TypingIndicator />}
-          </>
+            {isLoading && (
+              <div className="flex justify-start">
+                <TypingIndicator />
+              </div>
+            )}
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+      {/* Input - Better mobile layout */}
+      <div className="sticky bottom-0 bg-background border-t">
+        <div className="max-w-4xl mx-auto">
+          <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        </div>
+      </div>
     </div>
   );
 };
