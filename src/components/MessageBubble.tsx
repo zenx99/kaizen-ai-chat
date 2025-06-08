@@ -48,19 +48,19 @@ const MessageBubble = ({ message, isUser, timestamp }: MessageBubbleProps) => {
 
   return (
     <div className={cn(
-      "flex w-full mb-6",
+      "flex w-full mb-4 sm:mb-6",
       isUser ? "justify-end" : "justify-start"
     )}>
       <div className={cn(
-        "max-w-[85%] sm:max-w-[75%] md:max-w-[70%]",
+        "max-w-[90%] sm:max-w-[85%] md:max-w-[75%] lg:max-w-[70%]",
         isUser 
-          ? "bg-primary text-primary-foreground rounded-2xl px-4 py-3 shadow-sm" 
+          ? "bg-primary text-primary-foreground rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-sm" 
           : "bg-transparent"
       )}>
         {/* User messages */}
         {isUser ? (
           <>
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message}</p>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message}</p>
             <p className="text-xs mt-1 opacity-70 text-right">
               {timestamp.toLocaleTimeString('th-TH', { 
                 hour: '2-digit', 
@@ -70,23 +70,22 @@ const MessageBubble = ({ message, isUser, timestamp }: MessageBubbleProps) => {
           </>
         ) : (
           /* AI messages with code block support */
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {messageParts.map((part, index) => (
               <div key={index}>
                 {part.type === 'text' ? (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground break-words">
                     {part.content}
                   </p>
                 ) : (
                   <CodeBlock 
                     code={part.content} 
-                    language={part.language} 
-                    className="my-3"
+                    language={part.language}
                   />
                 )}
               </div>
             ))}
-            <p className="text-xs opacity-60 text-muted-foreground">
+            <p className="text-xs opacity-60 text-muted-foreground mt-2">
               {timestamp.toLocaleTimeString('th-TH', { 
                 hour: '2-digit', 
                 minute: '2-digit' 

@@ -1,8 +1,21 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Prism from 'prismjs';
+
+// Import languages
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-html';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-sql';
 
 interface CodeBlockProps {
   code: string;
@@ -13,6 +26,21 @@ interface CodeBlockProps {
 const CodeBlock = ({ code, language = "", className }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
+  const [highlightedCode, setHighlightedCode] = useState(code);
+
+  useEffect(() => {
+    if (language && Prism.languages[language]) {
+      try {
+        const highlighted = Prism.highlight(code, Prism.languages[language], language);
+        setHighlightedCode(highlighted);
+      } catch (error) {
+        console.error('Syntax highlighting error:', error);
+        setHighlightedCode(code);
+      }
+    } else {
+      setHighlightedCode(code);
+    }
+  }, [code, language]);
 
   const copyToClipboard = async () => {
     try {
@@ -39,38 +67,44 @@ const CodeBlock = ({ code, language = "", className }: CodeBlockProps) => {
   const canRun = language.toLowerCase() === 'html' || code.includes('<html') || code.includes('<!DOCTYPE');
 
   return (
-    <div className={cn("relative group", className)}>
-      <div className="flex items-center justify-between bg-muted/50 px-4 py-2 rounded-t-lg border-b">
-        <span className="text-xs font-medium text-muted-foreground uppercase">
-          {language || 'code'}
+    <div className={cn("relative group my-3 rounded-lg border bg-card overflow-hidden", className)}>
+      {/* Header */}
+      <div className="flex items-center justify-between bg-muted/30 px-3 py-2 border-b text-xs">
+        <span className="font-medium text-muted-foreground">
+          {language || 'plaintext'}
         </span>
-        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center space-x-1 opacity-70 group-hover:opacity-100 transition-opacity">
           {canRun && (
             <Button
               variant="ghost"
               size="sm"
               onClick={runCode}
               disabled={isRunning}
-              className="h-6 px-2 text-xs"
+              className="h-7 px-2 text-xs hover:bg-accent"
             >
               <Play className="w-3 h-3 mr-1" />
-              {isRunning ? 'Running...' : 'Run'}
+              <span className="hidden sm:inline">{isRunning ? 'Running...' : 'Run'}</span>
             </Button>
           )}
           <Button
             variant="ghost"
             size="sm"
             onClick={copyToClipboard}
-            className="h-6 px-2 text-xs"
+            className="h-7 px-2 text-xs hover:bg-accent"
           >
-            <Copy className="w-3 h-3 mr-1" />
-            {copied ? 'Copied!' : 'Copy'}
+            <Copy className="w-3 h-3 sm:mr-1" />
+            <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy'}</span>
           </Button>
         </div>
       </div>
-      <div className="bg-muted/20 rounded-b-lg">
-        <pre className="p-4 overflow-x-auto text-sm">
-          <code className="text-foreground font-mono">{code}</code>
+
+      {/* Code content */}
+      <div className="relative">
+        <pre className="p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm leading-relaxed bg-muted/10">
+          <code 
+            className="font-mono text-foreground block"
+            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+          />
         </pre>
       </div>
     </div>
