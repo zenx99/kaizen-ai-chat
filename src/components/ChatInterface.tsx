@@ -4,7 +4,7 @@ import { MessageSquare, Sparkles } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 import TypingIndicator from "./TypingIndicator";
-import { sendMessage } from "@/utils/apiService";
+import { sendMessage, ConversationMessage } from "@/utils/apiService";
 
 interface Message {
   id: string;
@@ -16,6 +16,7 @@ interface Message {
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string>(() => Date.now().toString());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -26,9 +27,17 @@ const ChatInterface = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  const getConversationHistory = (): ConversationMessage[] => {
+    return messages.map(msg => ({
+      role: msg.isUser ? 'user' as const : 'assistant' as const,
+      content: msg.text
+    }));
+  };
+
   const handleSendMessage = async (text: string) => {
+    const messageId = `${conversationId}-${Date.now()}`;
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: messageId,
       text,
       isUser: true,
       timestamp: new Date(),
@@ -38,20 +47,28 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const response = await sendMessage(text);
+      // ส่งประวัติการสนทนาไปด้วย
+      const conversationHistory = getConversationHistory();
+      const response = await sendMessage(text, conversationHistory);
       
+      const aiMessageId = `${conversationId}-${Date.now() + 1}`;
       const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: aiMessageId,
         text: response,
         isUser: false,
         timestamp: new Date(),
       };
 
+      console.log('User Message ID:', messageId);
+      console.log('AI Response ID:', aiMessageId);
+      console.log('Conversation History:', conversationHistory);
+
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessageId = `${conversationId}-error-${Date.now()}`;
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: errorMessageId,
         text: "ขออภัย เกิดข้อผิดพลาดในการส่งข้อความ กรุณาลองใหม่อีกครั้ง",
         isUser: false,
         timestamp: new Date(),
@@ -72,6 +89,7 @@ const ChatInterface = () => {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <h1 className="text-xl font-semibold">AI Chat</h1>
+            <span className="text-xs text-muted-foreground">ID: {conversationId}</span>
           </div>
         </div>
       </div>
