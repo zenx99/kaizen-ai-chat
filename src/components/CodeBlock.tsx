@@ -5,13 +5,12 @@ import { Copy, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Prism from 'prismjs';
 
-// Import languages
+// Import languages that actually exist
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-jsx';
 import 'prismjs/components/prism-tsx';
 import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-html';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-bash';
