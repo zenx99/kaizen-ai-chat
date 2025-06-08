@@ -1,14 +1,16 @@
 
 import { cn } from "@/lib/utils";
 import CodeBlock from "./CodeBlock";
+import TypeWriter from "./TypeWriter";
 
 interface MessageBubbleProps {
   message: string;
   isUser: boolean;
   timestamp: Date;
+  isTyping?: boolean;
 }
 
-const MessageBubble = ({ message, isUser, timestamp }: MessageBubbleProps) => {
+const MessageBubble = ({ message, isUser, timestamp, isTyping = false }: MessageBubbleProps) => {
   // Parse code blocks from the message
   const parseMessage = (text: string) => {
     const codeBlockRegex = /```(\w+)?\n?([\s\S]*?)```/g;
@@ -69,13 +71,17 @@ const MessageBubble = ({ message, isUser, timestamp }: MessageBubbleProps) => {
             </p>
           </>
         ) : (
-          /* AI messages with code block support */
+          /* AI messages with code block support and typing effect */
           <div className="space-y-2 sm:space-y-3">
             {messageParts.map((part, index) => (
               <div key={index}>
                 {part.type === 'text' ? (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground break-words">
-                    {part.content}
+                  <p className="text-sm leading-relaxed text-foreground break-words">
+                    {isTyping && index === messageParts.length - 1 ? (
+                      <TypeWriter text={part.content} speed={20} />
+                    ) : (
+                      <span className="whitespace-pre-wrap">{part.content}</span>
+                    )}
                   </p>
                 ) : (
                   <CodeBlock 

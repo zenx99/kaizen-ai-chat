@@ -11,6 +11,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  isTyping?: boolean;
 }
 
 const ChatInterface = () => {
@@ -28,7 +29,7 @@ const ChatInterface = () => {
   }, [messages, isLoading]);
 
   const getConversationHistory = (): ConversationMessage[] => {
-    return messages.map(msg => ({
+    return messages.filter(msg => !msg.isTyping).map(msg => ({
       role: msg.isUser ? 'user' as const : 'assistant' as const,
       content: msg.text
     }));
@@ -56,6 +57,7 @@ const ChatInterface = () => {
         text: response,
         isUser: false,
         timestamp: new Date(),
+        isTyping: true,
       };
 
       console.log('User Message ID:', messageId);
@@ -63,6 +65,16 @@ const ChatInterface = () => {
       console.log('Conversation History:', conversationHistory);
 
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Remove typing indicator after a delay to allow typing animation to complete
+      setTimeout(() => {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === aiMessageId ? { ...msg, isTyping: false } : msg
+          )
+        );
+      }, response.length * 20 + 1000); // Adjust timing based on message length
+      
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessageId = `${conversationId}-error-${Date.now()}`;
@@ -115,6 +127,7 @@ const ChatInterface = () => {
                 message={message.text}
                 isUser={message.isUser}
                 timestamp={message.timestamp}
+                isTyping={message.isTyping}
               />
             ))}
             {isLoading && (
